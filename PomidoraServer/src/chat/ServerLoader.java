@@ -16,7 +16,7 @@ import java.util.Scanner;
  * Created by pavel on 25.10.2017.
  * Pavel Nikulin BS1-8
  * Copyright ©
- * v0.1
+ * v2.0
  */
 public class ServerLoader {
 

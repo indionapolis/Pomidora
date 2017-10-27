@@ -13,7 +13,7 @@ import java.util.Scanner;
  * Created by pavel on 25.10.2017.
  * Pavel Nikulin BS1-8
  * Copyright ©
- * v0.0
+ * v2.0
  */
 //TODO проверка жив ли объект
 public class ClientLoader {
@@ -75,7 +75,8 @@ public class ClientLoader {
     private static void readChat(){
         Scanner scanner = new Scanner(System.in);
         while (true){
-            if (!isNamed) System.out.print("Enter your name: ");
+            if (!isNamed) System.out.print("You need to register before login\nEnter your name: "); //сообщение о регистрации
+            //else System.out.print("massage: ");
             if (scanner.hasNextLine()){           //если есть что чтать
 
                 String line = scanner.nextLine(); //читаем чат
@@ -85,12 +86,13 @@ public class ClientLoader {
                     end();
                 }
 
-                if (!isNamed){                    //если мы только регестрируемся
+                if (!isNamed){                              //если мы только регестрируемся
                     isNamed = true;
-                    System.out.println("Your name: " + line);
+                    System.out.println("You are ready to chat, " + line);
                     sendPacket(new PacketAuthorize(line));  //отправляем пакет с сообщением авторизации
                     continue;
                 }
+
                 sendPacket(new PacketMessage(name, line));  //отправляем пакет с сообщением
 
             }else {

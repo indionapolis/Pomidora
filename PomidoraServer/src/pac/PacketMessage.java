@@ -13,7 +13,7 @@ import java.net.Socket;
  * Created by pavel on 26.10.2017.
  * Pavel Nikulin BS1-8
  * Copyright ©
- * v0.0
+ * v1.0
  */
 public class PacketMessage extends OPacket {
 
@@ -48,9 +48,10 @@ public class PacketMessage extends OPacket {
 
     @Override
     public void handle() {
-
-        name = ServerLoader.getHandler(getSocket()).getNikName(); //получаем имя последнего пользователя
+        name = ServerLoader.getHandler(getSocket()).getNikName();                            //получаем имя последнего пользователя
+        ClientHandler tmp = ServerLoader.users.remove(getSocket());                          //удаляем из списка пользователей, которые получат сообщение
         ServerLoader.users.keySet().forEach(s -> ServerLoader.sendPackets(s, this)); //отправляем его сообщение всем
+        ServerLoader.users.put(getSocket(), tmp);                                           //добавляем обратно
         System.out.println("[" + name +"] " + message);
     }
 }
