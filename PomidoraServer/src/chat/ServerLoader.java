@@ -1,16 +1,20 @@
 package chat;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import pac.OPacket;
+import sun.net.NetworkServer;
+import sun.nio.ch.Net;
+import sun.security.x509.IPAddressName;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+//путь Desktop/programs/PomidoraServer/out/production/PomidoraServer
+//команда java -classpath ./ chat.ServerLoader
 /**
  * Project name: PomidoraServer
  * Created by pavel on 25.10.2017.
@@ -62,7 +66,7 @@ public class ServerLoader {
     /**
      *
      */
-    private static void handler(){
+    private static void handler() {
         handler = new ServerHandler(server);
         handler.start();
         readChat();
@@ -74,7 +78,7 @@ public class ServerLoader {
     /**
      * method to work with chat
      */
-    private static void readChat(){
+    private static void readChat() {
         Scanner scanner = new Scanner(System.in);
         while (true){
             if (scanner.hasNextLine()){           //если есть что чтать
@@ -83,6 +87,8 @@ public class ServerLoader {
 
                 if (line.equals("/end")){
                     end();
+                }else if (line.equals("/info")){
+                    info();
                 }else {
                     System.out.println("no such command");
                 }
@@ -129,6 +135,15 @@ public class ServerLoader {
             ex.printStackTrace();
         }
         System.exit(0); //выхожу из системы
+    }
+
+    public static void info(){
+        try {
+            System.out.println(InetAddress.getLocalHost().getHostName());
+            System.out.println(InetAddress.getLocalHost().getHostAddress());
+        }catch (UnknownHostException e){
+            e.fillInStackTrace();
+        }
     }
 
     public static ServerHandler getServerHandler(){

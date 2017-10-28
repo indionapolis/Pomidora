@@ -2,11 +2,11 @@ package pac;
 
 import chat.ClientHandler;
 import chat.ServerLoader;
+import pac.OPacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * Project name: PomidoraClient

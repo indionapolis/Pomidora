@@ -1,6 +1,7 @@
 package pac;
 
 import chat.ServerLoader;
+import pac.OPacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

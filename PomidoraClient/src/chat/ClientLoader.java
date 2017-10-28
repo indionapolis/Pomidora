@@ -4,10 +4,12 @@ import pac.*;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.net.*;
+import java.rmi.ServerException;
 import java.util.Scanner;
 
+//путь Desktop/programs/PomidoraClient/out/production/PomidoraClient
+//команда java -classpath ./ chat.ClientLoader
 /**
  * Project name: PomidoraClient
  * Created by pavel on 25.10.2017.
@@ -22,7 +24,7 @@ public class ClientLoader {
 
     private static InetAddress IP;
 
-    private static final String address =  "10.240.21.28"; //эта хуйня может меняться
+    private static String address; //эта хуйня может меняться
 
     private static Socket server; //connection server
     private static ClientHandler handler;
@@ -47,8 +49,23 @@ public class ClientLoader {
      */
     private static void connect(){
         try {
-            IP = InetAddress.getByName(address);
-            server = new Socket(IP, PORT);
+            while (true){
+
+                Scanner scanner = new Scanner(System.in);
+                System.out.print("Enter server IP address: ");
+                address = scanner.next();
+                try {  //пробуем подключиться к серверу по IP
+
+                    IP = InetAddress.getByName(address);
+                    server = new Socket(IP, PORT);
+                    System.out.println("You successfully connect to the server");
+                }catch (UnknownHostException | NoRouteToHostException | ConnectException e){
+                    System.out.println("Not valid IP address: " + e.getLocalizedMessage());
+
+                    continue;
+                }
+                break;
+            }
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -61,6 +78,7 @@ public class ClientLoader {
      * method to handel with client
      */
     private static void handle(){
+        System.out.println("Начал хендл");
         handler = new ClientHandler(server);
         handler.start();
         readChat();
