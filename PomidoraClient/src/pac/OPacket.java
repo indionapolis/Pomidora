@@ -1,5 +1,7 @@
 package pac;
 
+import chat.ClientWindow;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -20,4 +22,6 @@ public abstract class OPacket {
     public abstract void read(DataInputStream dis) throws IOException;
 
     public abstract void handle();
+
+    public abstract void handle(ClientWindow window);
 }

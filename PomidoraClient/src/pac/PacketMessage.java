@@ -1,5 +1,8 @@
 package pac;
 
+import chat.ClientWindow;
+import chat.ClientLoader;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -21,8 +24,7 @@ public class PacketMessage extends OPacket {
 
     }
 
-    public PacketMessage(String name, String message){
-        this.name = name;
+    public PacketMessage( String message){
         this.message = message;
     }
 
@@ -43,7 +45,13 @@ public class PacketMessage extends OPacket {
     }
 
     @Override
+    public void handle(ClientWindow window) {
+        window.printMessage("[" + name + "] " + message);
+        //TODO make it normal
+    }
+
+    @Override
     public void handle() {
-        System.out.println("[" + name + "] " + message); //выводим массадж
+
     }
 }

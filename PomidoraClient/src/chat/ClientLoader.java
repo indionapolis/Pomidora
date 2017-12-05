@@ -2,9 +2,14 @@ package chat;
 
 import pac.*;
 
+import javax.swing.*;
+import java.awt.event.WindowEvent;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.*;
+import java.nio.Buffer;
 import java.rmi.ServerException;
 import java.util.Scanner;
 
@@ -20,51 +25,60 @@ import java.util.Scanner;
 //TODO проверка жив ли объект
 public class ClientLoader {
 
-    private static final int PORT = 4444; //эта нет
-
-    private static InetAddress IP;
-
+    private static final int PORT = 5555; //эта нет
     private static String address; //эта хуйня может меняться
-
+    private static InetAddress IP;
     private static Socket server; //connection server
+
     private static ClientHandler handler;
+
     private static boolean isNamed = false;
-    private static String name;
+    private static String name = "none";
 
-
+    private static ClientWindow WINDOW = new ClientWindow();
 
     /**
      * Set up of user
      */
     public static void main(String[] args) {
-        connect();
-        handle();
-        end();
     }
+
+
 
 
     //TODO обработать ошибку если подключаюсь к несуществующему серверу
     /**
      * Method to connect with server
      */
-    private static void connect(){
+    protected static void connect(){
         try {
-            while (true){
+            address = WINDOW.getText();
+            if (!address.matches("^[0-9]{1,3}+\\.+[0-9]{1,3}+\\.+[0-9]{1,3}+\\.+[0-9]{1,3}$")){
+                //ip address masc
+                WINDOW.textField.setText("");
+                return;
+            }
+            try {  //пробуем подключиться к серверу по IP
 
-                Scanner scanner = new Scanner(System.in);
-                System.out.print("Enter server IP address: ");
-                address = scanner.next();
-                try {  //пробуем подключиться к серверу по IP
 
-                    IP = InetAddress.getByName(address);
-                    server = new Socket(IP, PORT);
-                    System.out.println("You successfully connect to the server");
-                }catch (UnknownHostException | NoRouteToHostException | ConnectException e){
-                    System.out.println("Not valid IP address: " + e.getLocalizedMessage());
+                IP = InetAddress.getByName(address);
 
-                    continue;
-                }
-                break;
+                server = new Socket(IP, PORT);
+
+
+                sendPacket(new PacketConnect());
+                System.out.println("You successfully connect to the server");
+
+                WINDOW.textField.setText("");
+                WINDOW.authorize();
+
+                handler = new ClientHandler(server, WINDOW);
+                handler.start();
+
+                //TODO next step
+            }catch (UnknownHostException | NoRouteToHostException | ConnectException e){
+                System.out.println("Not valid IP address: " + e.getLocalizedMessage());
+                WINDOW.textField.setText("");
             }
         }catch (IOException e){
             e.printStackTrace();
@@ -74,51 +88,32 @@ public class ClientLoader {
 
 
 
-    /**
-     * method to handel with client
-     */
-    private static void handle(){
-        System.out.println("Начал хендл");
-        handler = new ClientHandler(server);
-        handler.start();
-        readChat();
+
+
+    protected static void authorize(){
+        if (!isNamed) {
+            name = WINDOW.getText();
+            if (name.equals("")) return;
+            isNamed = true;
+            sendPacket(new PacketAuthorize(name));  //отправляем пакет с сообщением авторизации
+            WINDOW.chat();
+        }
     }
-
-
 
 
     /**
      * method to work with chat
      */
-    private static void readChat(){
-        Scanner scanner = new Scanner(System.in);
-        while (true){
-            if (!isNamed) System.out.print("You need to register before login\nEnter your name: "); //сообщение о регистрации
-            //else System.out.print("massage: ");
-            if (scanner.hasNextLine()){           //если есть что чтать
+    protected static void readChat(){
 
-                String line = scanner.nextLine(); //читаем чат
+        String line = WINDOW.getText();
 
-                if (line.equals("/end")) {
-                    sendPacket(new PacketEnd(name));
-                    end();
-                }
+        if (line.equals("/end")) {
+            //end();
+        }else if (line.equals("")) return;
 
-                if (!isNamed){                              //если мы только регестрируемся
-                    isNamed = true;
-                    System.out.println("You are ready to chat, " + line);
-                    sendPacket(new PacketAuthorize(line));  //отправляем пакет с сообщением авторизации
-                    continue;
-                }
+        sendPacket(new PacketMessage(line));  //отправляем пакет с сообщением
 
-                sendPacket(new PacketMessage(name, line));  //отправляем пакет с сообщением
-
-            }else {
-                try {
-                    Thread.sleep(10);
-                }catch (InterruptedException e){}
-            }
-        }
     }
 
 
@@ -142,17 +137,22 @@ public class ClientLoader {
 
 
 
+    //TODO нормальное закрытие окна
     /**
      * method to stop execution of program
      */
     public static void end(){
-        //TODO отправлять пакет отключения от сервера
-        System.out.println("End user");
-        try {
-            server.close();
-        }catch (IOException ex){
-            ex.printStackTrace();
+        if (server == null){
+            return;
+        }else {
+            sendPacket(new PacketEnd(name));
+            //TODO отправлять пакет отключения от сервера
+            System.out.println("End user");
+            try {
+                server.close();
+            }catch (IOException ex){
+                ex.printStackTrace();
+            }
         }
-        System.exit(0); //выхожу из системы
     }
 }

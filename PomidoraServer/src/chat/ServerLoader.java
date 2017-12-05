@@ -24,7 +24,7 @@ import java.util.Scanner;
  */
 public class ServerLoader {
 
-    private static final int PORT = 4444;
+    private static final int PORT = 5555;
 
     private static ServerSocket server;
     private static ServerHandler handler;
@@ -32,6 +32,7 @@ public class ServerLoader {
     public static Map<Socket, ClientHandler> users = new HashMap<>();
 
 
+    //TODO проверку на соединение сервера и пользователя
 
 
     /**
@@ -39,6 +40,7 @@ public class ServerLoader {
      * @param args
      */
     public static void main(String[] args) {
+
         start(PORT);
         handler();
         end();
@@ -154,8 +156,13 @@ public class ServerLoader {
         return handlers.get(socket); //получаем клиента сокета
     }
 
-    public static void invalidate(Socket socket){
+    public static boolean invalidate(Socket socket){
         handlers.remove(socket);
+        if (!users.containsKey(socket)) {
+            System.out.println(socket.getInetAddress() + " disconnect");
+            return true;
+        }
         System.out.println(users.remove(socket).getNikName() + " disconnect");
+        return false;
     }
 }

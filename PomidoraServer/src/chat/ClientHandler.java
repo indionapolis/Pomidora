@@ -27,6 +27,7 @@ public class ClientHandler extends Thread{
     public ClientHandler(Socket client){
         this.client = client;
         System.out.println("New client connect to " + client.toString());
+        nikname = "none";
         start();
     }
 
@@ -61,7 +62,7 @@ public class ClientHandler extends Thread{
                 return false;
             }
             short id = dis.readShort();//считываем id
-            OPacket packet = PacketManager.grtPacket(id); //соз
+            OPacket packet = PacketManager.getPacket(id); //соз
             packet.setSocket(client); //задали сокет клиента
             packet.read(dis);         //пррочитали пакет
             packet.handle();          //обрабатываем

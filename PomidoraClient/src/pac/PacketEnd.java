@@ -1,5 +1,7 @@
 package pac;
 
+import chat.ClientWindow;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -15,13 +17,12 @@ public class PacketEnd extends OPacket {
 
     private String name;
 
+    public PacketEnd(){}
+
     public PacketEnd(String name){
         this.name = name;
     }
 
-    public PacketEnd(){
-
-    }
 
     @Override
     public short getID() {
@@ -30,16 +31,22 @@ public class PacketEnd extends OPacket {
 
     @Override
     public void write(DataOutputStream dos) throws IOException {
-        //dos.writeUTF(name);
+        dos.writeUTF(name);
     }
 
     @Override
     public void read(DataInputStream dis) throws IOException {
-        //name = dis.readUTF();
+        name = dis.readUTF();
+    }
+
+    @Override
+    public void handle(ClientWindow window) {
+        window.printMessage(name + " disconnect");
+        System.out.println(name + " disconnect");
     }
 
     @Override
     public void handle() {
-        //System.out.println(name + " disconnect");
+
     }
 }

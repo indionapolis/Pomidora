@@ -1,5 +1,7 @@
 package pac;
 
+import chat.ClientWindow;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,7 +16,6 @@ import java.io.IOException;
 public class PacketAuthorize extends OPacket {
 
     private String name;
-
 
     public PacketAuthorize(){}
 
@@ -38,7 +39,13 @@ public class PacketAuthorize extends OPacket {
     }
 
     @Override
-    public void handle() {
+    public void handle(ClientWindow window) {
+        window.printMessage("new user connect: " + name);
         System.out.println("new user connect: " + name);
+    }
+
+    @Override
+    public void handle() {
+
     }
 }

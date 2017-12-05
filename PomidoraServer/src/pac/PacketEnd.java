@@ -33,19 +33,19 @@ public class PacketEnd extends OPacket {
 
     @Override
     public void write(DataOutputStream dos) throws IOException {
-        //dos.writeUTF(name);
+        dos.writeUTF(name);
     }
 
     @Override
     public void read(DataInputStream dis) throws IOException {
-        //name = dis.readUTF();
+        name = dis.readUTF();
     }
 
     @Override
     public void handle() {
 
-        ServerLoader.invalidate(getSocket());
-        //ServerLoader.users.keySet().forEach(s -> ServerLoader.sendPackets(s, this)); //отправляем его сообщение всем
-        //System.out.println(name + " disconnect");
+        if (ServerLoader.invalidate(getSocket())) return; //удаляем отправителя пакета и если он не авторизован то не сообщаем об удалении
+        ServerLoader.users.keySet().forEach(s -> ServerLoader.sendPackets(s, new PacketEnd(name))); //отправляем сообщение о его отключении всем
+
     }
 }
